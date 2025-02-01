@@ -10,7 +10,7 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
     
-    let itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,7 +52,42 @@ class TodoListViewController: UITableViewController {
         // to provide gray background selection animation when clicking on a row
         tableView.deselectRow(at: indexPath, animated: true)
     }
-
+    
+    
+    //MARK: - Add New Items
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        
+        var textField = UITextField()  // creating local variable to extend the scope of alertTextField below
+        
+        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { action in
+            // what will happen once the user clicks the Add Item button on our UIAlert
+            
+            if let safeTodoItem = textField.text {
+                self.itemArray.append(safeTodoItem)
+            }
+            
+            self.tableView.reloadData()
+            
+        }
+        
+        
+        // Add a textfield to the alert message (Only triggered at the point when the alert pops up and the text field is added to the alert)
+        alert.addTextField { alertTextField in
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField  // extending the scope of alertTextField to be available inside addButtonPressed
+            
+        }
+        
+        alert.addAction(action)  // the above action to be done is added in the action sheet of the app
+        
+        present(alert, animated: true, completion: nil)
+        
+        
+    }
+    
 
 }
 
