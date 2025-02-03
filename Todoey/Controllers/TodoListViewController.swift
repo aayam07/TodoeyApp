@@ -10,7 +10,7 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
     
-    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    var itemArray = [Task]()
     
     let defaults = UserDefaults.standard
 
@@ -19,9 +19,22 @@ class TodoListViewController: UITableViewController {
         // Do any additional setup after loading the view.
         
 //        The as? operator is used for conditional type casting. It tries to cast the array to [String]. If the cast succeeds, it returns the array of strings; otherwise, it returns nil.
-        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
-            itemArray = items  // set the stored user-default array to use on our app
-        }
+//        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+//            itemArray = items  // set the stored user-default array to use on our app
+//        }
+        
+        let newTask = Task()
+        newTask.title = "Buy milk"
+        itemArray.append(newTask)
+        
+        let newTask2 = Task()
+        newTask2.title = "Buy Pizza"
+        itemArray.append(newTask2)
+        
+        let newTask3 = Task()
+        newTask3.title = "Buy Eggs"
+        itemArray.append(newTask3)
+        
     }
     
     //MARK: - TableView Datasource Methods
@@ -31,14 +44,23 @@ class TodoListViewController: UITableViewController {
     
     // this function runs for as many times as the number of rows returned from the above method
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let item = itemArray[indexPath.row]
+        
+//        print("cellForRowAtIndexPath Called")
+//        let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell")
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
 //        cell?.textLabel?.text = item // will be depriccated in the future iOS versions
         
         // Configure the cell's content
         var cellContent = cell.defaultContentConfiguration()
-        cellContent.text = item
+        cellContent.text = item.title
+        
         cell.contentConfiguration = cellContent
+        
+//        item.done ? (cell.accessoryType = .checkmark) : (cell.accessoryType = .none)
+        cell.accessoryType = item.done ? .checkmark : .none
         
         return cell
     }
@@ -49,12 +71,15 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        print(itemArray[indexPath.row])
         
+        itemArray[indexPath.row].done.toggle()
+        tableView.reloadData()  // forces the table view to call its data source methods again
+        
         // to add a checkmark when a cell gets selected and remove checkmark if already selected
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+//        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+//            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+//        } else {
+//            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+//        }
         
         // to provide gray background selection animation when clicking on a row
         tableView.deselectRow(at: indexPath, animated: true)
@@ -72,7 +97,10 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { action in
             // what will happen once the user clicks the Add Item button on our UIAlert
             
-            self.itemArray.append(textField.text!)
+            let newTask = Task()
+            newTask.title = textField.text!
+            
+            self.itemArray.append(newTask)
             
             self.defaults.set(self.itemArray, forKey: "TodoListArray") // User Defaults store data as a Key-Value pair
             
@@ -92,9 +120,7 @@ class TodoListViewController: UITableViewController {
         
         present(alert, animated: true, completion: nil)
         
-        
     }
     
-
 }
 
