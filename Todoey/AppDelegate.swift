@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("didFinishLaunchingWithOptions")
         
         // to print the path where our data has been saved as user defaults
-        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
+//        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
         
         return true
     }

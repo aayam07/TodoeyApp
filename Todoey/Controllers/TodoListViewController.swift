@@ -12,28 +12,37 @@ class TodoListViewController: UITableViewController {
     
     var itemArray = [Task]()
     
-    let defaults = UserDefaults.standard
+//    let defaults = UserDefaults.standard
 
+    // to unitilixe NSCoder
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+//        print(dataFilePath)
+//        
+//        let newTask = Task()
+//        newTask.title = "Buy milk"
+//        itemArray.append(newTask)
+//        
+//        let newTask2 = Task()
+//        newTask2.title = "Buy Pizza"
+//        itemArray.append(newTask2)
+//        
+//        let newTask3 = Task()
+//        newTask3.title = "Buy Eggs"
+//        itemArray.append(newTask3)
+        
 //        The as? operator is used for conditional type casting. It tries to cast the array to [String]. If the cast succeeds, it returns the array of strings; otherwise, it returns nil.
-//        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+//        if let items = defaults.array(forKey: "TodoListArray") as? [Task] {
+//            print("Executed \(items)")
 //            itemArray = items  // set the stored user-default array to use on our app
 //        }
         
-        let newTask = Task()
-        newTask.title = "Buy milk"
-        itemArray.append(newTask)
-        
-        let newTask2 = Task()
-        newTask2.title = "Buy Pizza"
-        itemArray.append(newTask2)
-        
-        let newTask3 = Task()
-        newTask3.title = "Buy Eggs"
-        itemArray.append(newTask3)
+        // to load the items stored in the plist by decoding it into the itemArray
+        loadItems()
         
     }
     
@@ -71,8 +80,11 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        print(itemArray[indexPath.row])
         
-        itemArray[indexPath.row].done.toggle()
-        tableView.reloadData()  // forces the table view to call its data source methods again
+        itemArray[indexPath.row].done.toggle()  // only reflected in the itemArray but needs to be stored in our plist
+        
+        saveItems()
+        
+//        tableView.reloadData()  // forces the table view to call its data source methods again
         
         // to add a checkmark when a cell gets selected and remove checkmark if already selected
 //        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
@@ -102,9 +114,9 @@ class TodoListViewController: UITableViewController {
             
             self.itemArray.append(newTask)
             
-            self.defaults.set(self.itemArray, forKey: "TodoListArray") // User Defaults store data as a Key-Value pair
+//            self.defaults.set(self.itemArray, forKey: "TodoListArray") //  User Defaults store data as a Key-Value pair
             
-            self.tableView.reloadData()
+            self.saveItems()
             
         }
         
@@ -122,5 +134,37 @@ class TodoListViewController: UITableViewController {
         
     }
     
+    //MARK: - Model Manipulation Methods
+
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(self.itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding item array, \(error)")
+        }
+        
+        
+        tableView.reloadData()
+    }
+    
+    
+    func loadItems() {
+        
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Task].self, from: data)
+            } catch {
+                print("Error decoding item array, \(error).")
+            }
+            
+        }
+    }
+    
 }
+
+
 

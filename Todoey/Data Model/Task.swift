@@ -8,7 +8,9 @@
 
 import Foundation
 
-class Task {
+
+// for a class to conform to Encodable protocol, all of its properties must have standard data types. Custom data types like class and struct doesn't work
+class Task: Codable {
     var title: String = ""
     var done: Bool = false
 }
