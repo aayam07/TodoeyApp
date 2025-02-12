@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController {
     
@@ -17,12 +18,21 @@ class TodoListViewController: UITableViewController {
     // to utilize NSCoder and find the folder of the app inside app's sandbox
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
+    // we can create AppDelegate's object as (UIApplication.shared.delegate as! AppDelegate)
+    // Description:
+    // shared is a singleton which corresponds to the current app running on a user's iphone as an object
+    // delegate of shared singleton and our AppDelegate inherits from the same superclass, so the downcasting is valid
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
 //        print(dataFilePath)
-//        
+        
+        // to get a path of where our data is being stored for our current app
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+//
 //        let newTask = Task()
 //        newTask.title = "Buy milk"
 //        itemArray.append(newTask)
@@ -42,7 +52,7 @@ class TodoListViewController: UITableViewController {
 //        }
         
         // to load the items stored in the plist by decoding it into the itemArray
-        loadItems()
+//        loadItems()
         
     }
     
@@ -102,17 +112,20 @@ class TodoListViewController: UITableViewController {
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
+        // what will happen once the user clicks the Add Item button on our UIAlert
+        
         var textField = UITextField()  // creating local variable to extend the scope of alertTextField below
         
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add Item", style: .default) { action in
-            // what will happen once the user clicks the Add Item button on our UIAlert
             
-            let newTask = Item()
-            newTask.title = textField.text!
+            let newItem = Item(context: self.context)
+            newItem.title = textField.text!
+            newItem.done = false
             
-            self.itemArray.append(newTask)
+            
+            self.itemArray.append(newItem)
             
 //            self.defaults.set(self.itemArray, forKey: "TodoListArray") //  User Defaults store data as a Key-Value pair
             
@@ -137,31 +150,30 @@ class TodoListViewController: UITableViewController {
     // MARK: - Model Manipulation Methods (For NSCoder)
 
     func saveItems() {
-        let encoder = PropertyListEncoder()
         
+        // using Core Data
         do {
-            let data = try encoder.encode(self.itemArray)
-            try data.write(to: dataFilePath!)
+            try context.save()
         } catch {
-            print("Error encoding item array, \(error)")
+            print("Error saving context \(error)")
         }
         
         tableView.reloadData()  // to reload new data into the table
     }
     
     
-    func loadItems() {
-        
-        // try? halyo vani Do{} vitra halnu parena
-        if let data = try? Data(contentsOf: dataFilePath!) {
-            let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print("Error decoding item array, \(error).")
-            }
-        }
-    }
+//    func loadItems() {
+//        
+//        // try? halyo vani Do{} vitra halnu parena
+//        if let data = try? Data(contentsOf: dataFilePath!) {
+//            let decoder = PropertyListDecoder()
+//            do {
+//                itemArray = try decoder.decode([Item].self, from: data)
+//            } catch {
+//                print("Error decoding item array, \(error).")
+//            }
+//        }
+//    }
     
 }
 
