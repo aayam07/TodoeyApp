@@ -10,11 +10,11 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
     
-    var itemArray = [Task]()
+    var itemArray = [Item]()
     
 //    let defaults = UserDefaults.standard
 
-    // to unitilixe NSCoder
+    // to utilize NSCoder and find the folder of the app inside app's sandbox
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
     override func viewDidLoad() {
@@ -109,7 +109,7 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { action in
             // what will happen once the user clicks the Add Item button on our UIAlert
             
-            let newTask = Task()
+            let newTask = Item()
             newTask.title = textField.text!
             
             self.itemArray.append(newTask)
@@ -134,7 +134,7 @@ class TodoListViewController: UITableViewController {
         
     }
     
-    //MARK: - Model Manipulation Methods
+    // MARK: - Model Manipulation Methods (For NSCoder)
 
     func saveItems() {
         let encoder = PropertyListEncoder()
@@ -146,21 +146,20 @@ class TodoListViewController: UITableViewController {
             print("Error encoding item array, \(error)")
         }
         
-        
-        tableView.reloadData()
+        tableView.reloadData()  // to reload new data into the table
     }
     
     
     func loadItems() {
         
+        // try? halyo vani Do{} vitra halnu parena
         if let data = try? Data(contentsOf: dataFilePath!) {
             let decoder = PropertyListDecoder()
             do {
-                itemArray = try decoder.decode([Task].self, from: data)
+                itemArray = try decoder.decode([Item].self, from: data)
             } catch {
                 print("Error decoding item array, \(error).")
             }
-            
         }
     }
     
