@@ -13,8 +13,8 @@ class TodoListViewController: UITableViewController {
     
     var itemArray = [Item]()
     
-//    let defaults = UserDefaults.standard
-
+    //    let defaults = UserDefaults.standard
+    
     // to utilize NSCoder and find the folder of the app inside app's sandbox
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
@@ -28,31 +28,31 @@ class TodoListViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-//        print(dataFilePath)
+        //        print(dataFilePath)
         
         // to get a path of where our data is being stored for our current app
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-//
-//        let newTask = Task()
-//        newTask.title = "Buy milk"
-//        itemArray.append(newTask)
-//        
-//        let newTask2 = Task()
-//        newTask2.title = "Buy Pizza"
-//        itemArray.append(newTask2)
-//        
-//        let newTask3 = Task()
-//        newTask3.title = "Buy Eggs"
-//        itemArray.append(newTask3)
+        //
+        //        let newTask = Task()
+        //        newTask.title = "Buy milk"
+        //        itemArray.append(newTask)
+        //
+        //        let newTask2 = Task()
+        //        newTask2.title = "Buy Pizza"
+        //        itemArray.append(newTask2)
+        //
+        //        let newTask3 = Task()
+        //        newTask3.title = "Buy Eggs"
+        //        itemArray.append(newTask3)
         
-//        The as? operator is used for conditional type casting. It tries to cast the array to [String]. If the cast succeeds, it returns the array of strings; otherwise, it returns nil.
-//        if let items = defaults.array(forKey: "TodoListArray") as? [Task] {
-//            print("Executed \(items)")
-//            itemArray = items  // set the stored user-default array to use on our app
-//        }
+        //        The as? operator is used for conditional type casting. It tries to cast the array to [String]. If the cast succeeds, it returns the array of strings; otherwise, it returns nil.
+        //        if let items = defaults.array(forKey: "TodoListArray") as? [Task] {
+        //            print("Executed \(items)")
+        //            itemArray = items  // set the stored user-default array to use on our app
+        //        }
         
         // to load the items stored in the plist by decoding it into the itemArray
-//        loadItems()
+        loadItems()
         
     }
     
@@ -66,11 +66,11 @@ class TodoListViewController: UITableViewController {
         
         let item = itemArray[indexPath.row]
         
-//        print("cellForRowAtIndexPath Called")
-//        let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell")
+        //        print("cellForRowAtIndexPath Called")
+        //        let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell")
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
-//        cell?.textLabel?.text = item // will be depriccated in the future iOS versions
+        //        cell?.textLabel?.text = item // will be depriccated in the future iOS versions
         
         // Configure the cell's content
         var cellContent = cell.defaultContentConfiguration()
@@ -78,7 +78,7 @@ class TodoListViewController: UITableViewController {
         
         cell.contentConfiguration = cellContent
         
-//        item.done ? (cell.accessoryType = .checkmark) : (cell.accessoryType = .none)
+        //        item.done ? (cell.accessoryType = .checkmark) : (cell.accessoryType = .none)
         cell.accessoryType = item.done ? .checkmark : .none
         
         return cell
@@ -88,20 +88,20 @@ class TodoListViewController: UITableViewController {
     //MARK: - TableView Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        print(itemArray[indexPath.row])
+        //        print(itemArray[indexPath.row])
         
         itemArray[indexPath.row].done.toggle()  // only reflected in the itemArray but needs to be stored in our plist
         
         saveItems()
         
-//        tableView.reloadData()  // forces the table view to call its data source methods again
+        //        tableView.reloadData()  // forces the table view to call its data source methods again
         
         // to add a checkmark when a cell gets selected and remove checkmark if already selected
-//        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-//        } else {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-//        }
+        //        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+        //            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        //        } else {
+        //            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        //        }
         
         // to provide gray background selection animation when clicking on a row
         tableView.deselectRow(at: indexPath, animated: true)
@@ -127,7 +127,7 @@ class TodoListViewController: UITableViewController {
             
             self.itemArray.append(newItem)
             
-//            self.defaults.set(self.itemArray, forKey: "TodoListArray") //  User Defaults store data as a Key-Value pair
+            //            self.defaults.set(self.itemArray, forKey: "TodoListArray") //  User Defaults store data as a Key-Value pair
             
             self.saveItems()
             
@@ -148,7 +148,7 @@ class TodoListViewController: UITableViewController {
     }
     
     // MARK: - Model Manipulation Methods (For NSCoder)
-
+    
     func saveItems() {
         
         // using Core Data
@@ -162,19 +162,18 @@ class TodoListViewController: UITableViewController {
     }
     
     
-//    func loadItems() {
-//        
-//        // try? halyo vani Do{} vitra halnu parena
-//        if let data = try? Data(contentsOf: dataFilePath!) {
-//            let decoder = PropertyListDecoder()
-//            do {
-//                itemArray = try decoder.decode([Item].self, from: data)
-//            } catch {
-//                print("Error decoding item array, \(error).")
-//            }
-//        }
-//    }
-    
+    func loadItems() {
+        
+        let request: NSFetchRequest<Item> = Item.fetchRequest() // <Item> means that it is going to fetch requests in the form of this data type i.e. the Entity that we're trying to request
+        
+        do {
+            itemArray = try context.fetch(request)  // returns every Item in an array (i.e NSManagedObject) in our Persistent Container
+        } catch {
+            print("Error fetching data from context \(error)")
+        }
+        
+        
+    }
 }
 
 
