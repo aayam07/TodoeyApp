@@ -90,6 +90,9 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //        print(itemArray[indexPath.row])
         
+        // To update the NSManaged Object [Update(U) in CRUD]
+        itemArray[indexPath.row].setValue("Completed", forKey: "title")
+        
         itemArray[indexPath.row].done.toggle()  // only reflected in the itemArray but needs to be stored in our plist
         
         saveItems()
