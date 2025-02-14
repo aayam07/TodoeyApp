@@ -91,7 +91,11 @@ class TodoListViewController: UITableViewController {
         //        print(itemArray[indexPath.row])
         
         // To update the NSManaged Object [Update(U) in CRUD]
-        itemArray[indexPath.row].setValue("Completed", forKey: "title")
+//        itemArray[indexPath.row].setValue("Completed", forKey: "title")
+        
+//        context.delete(itemArray[indexPath.row])  // finds the current NSManagedObject from the persistent container and deletes it in the temporary area (in the context)
+//        itemArray.remove(at: indexPath.row)  // will only remove from the item array (first we remove the item from the persistent storage and then only we remove from the array to avoid app crash due to indexing)
+        
         
         itemArray[indexPath.row].done.toggle()  // only reflected in the itemArray but needs to be stored in our plist
         
