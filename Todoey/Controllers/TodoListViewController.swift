@@ -52,7 +52,7 @@ class TodoListViewController: UITableViewController {
         //        }
         
         // to load the items stored in the plist by decoding it into the itemArray
-        loadItems()
+        loadItems()  // default value for the parameter will be used inside the method definination
         
     }
     
@@ -169,9 +169,9 @@ class TodoListViewController: UITableViewController {
     }
     
     
-    func loadItems() {
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
         
-        let request: NSFetchRequest<Item> = Item.fetchRequest() // <Item> means that it is going to fetch requests in the form of this data type i.e. the Entity that we're trying to request
+//        let request: NSFetchRequest<Item> = Item.fetchRequest() // <Item> means that it is going to fetch requests in the form of this data type i.e. the Entity that we're trying to request
         
         do {
             itemArray = try context.fetch(request)  // returns every Item in an array (i.e NSManagedObject) in our Persistent Container
@@ -179,9 +179,41 @@ class TodoListViewController: UITableViewController {
             print("Error fetching data from context \(error)")
         }
         
-        
+        tableView.reloadData()
     }
 }
 
+
+//MARK: - UISearchBarDelegate Methods
+
+extension TodoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        
+        // Quering Objects in Core Data (predicate tells how we want to query our database)
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true) // how to order a collection of objects
+        
+        request.sortDescriptors = [sortDescriptor] // can have multiple descriptors in the array
+        
+        loadItems(with: request)
+    
+    }
+    
+    // triggered when the text inside the search bar is changed
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            
+            // Updating the UI in the main thread. async means the task must be carried out immediately/parallely
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
+    }
+}
 
 
