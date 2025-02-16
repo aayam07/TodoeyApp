@@ -52,7 +52,7 @@ class TodoListViewController: UITableViewController {
         //        }
         
         // to load the items stored in the plist by decoding it into the itemArray
-        loadItems()  // default value for the parameter will be used inside the method definination
+        loadItems()  // default value for the parameter will be used inside the method definination (load items with the entire list)
         
     }
     
@@ -127,6 +127,7 @@ class TodoListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Item", style: .default) { action in
             
+            // triggered when Add Item is pressed in our alert
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false
