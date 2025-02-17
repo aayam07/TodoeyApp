@@ -13,6 +13,14 @@ class TodoListViewController: UITableViewController {
     
     var itemArray = [Item]()
     
+    var selectedCategory: Category? {
+        
+        // special keyword didSet. Everything inside its {} is going to be executed as soon as selectedCategory variable gets set with a value. We do this instead of writing loadItems() in viewDidLoad to prevent app crash
+        didSet {
+            loadItems()
+        }
+    } // ? because its value is nil until the category is selected in the CategoryViewController and segue is performed
+    
     //    let defaults = UserDefaults.standard
     
     // to utilize NSCoder and find the folder of the app inside app's sandbox
@@ -52,7 +60,7 @@ class TodoListViewController: UITableViewController {
         //        }
         
         // to load the items stored in the plist by decoding it into the itemArray
-        loadItems()  // default value for the parameter will be used inside the method definination (load items with the entire list)
+//        loadItems()  // default value for the parameter will be used inside the method definination (load items with the entire list)
         
     }
     
@@ -132,6 +140,8 @@ class TodoListViewController: UITableViewController {
             newItem.title = textField.text!
             newItem.done = false
             
+            newItem.parentCategory = self.selectedCategory
+            
             
             self.itemArray.append(newItem)
             
@@ -170,9 +180,22 @@ class TodoListViewController: UITableViewController {
     }
     
     
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
         
 //        let request: NSFetchRequest<Item> = Item.fetchRequest() // <Item> means that it is going to fetch requests in the form of this data type i.e. the Entity that we're trying to request
+        
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        // 'local varibale predicate value only comes up when searching in the search bar
+        if let additionalPredicate = predicate {
+            let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+            
+            request.predicate = compoundPredicate
+        } else {
+            request.predicate = categoryPredicate
+        }
+        
+        
         
         do {
             itemArray = try context.fetch(request)  // returns every Item in an array (i.e NSManagedObject) in our Persistent Container
@@ -194,13 +217,13 @@ extension TodoListViewController: UISearchBarDelegate {
         let request: NSFetchRequest<Item> = Item.fetchRequest()
         
         // Quering Objects in Core Data (predicate tells how we want to query our database)
-        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         
         let sortDescriptor = NSSortDescriptor(key: "title", ascending: true) // how to order a collection of objects
         
         request.sortDescriptors = [sortDescriptor] // can have multiple descriptors in the array
         
-        loadItems(with: request)
+        loadItems(with: request, predicate: predicate)  // send request and predicate separately to ensure that the search logic works in Categorical Implementation of our app
     
     }
     
